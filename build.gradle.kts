@@ -1,8 +1,11 @@
+import com.google.protobuf.gradle.protobuf
+import com.google.protobuf.gradle.protoc
 import java.net.URI
 
 plugins {
     id("java")
     id("maven-publish")
+    id("com.google.protobuf") version "0.8.18"
 }
 
 group = "org.dlms"
@@ -13,18 +16,32 @@ repositories {
 }
 
 dependencies {
+    implementation("com.google.protobuf:protobuf-java:3.21.12")
     testImplementation(platform("org.junit:junit-bom:5.10.0"))
     testImplementation("org.junit.jupiter:junit-jupiter")
+}
+
+protobuf {
+    protoc {
+        artifact = "com.google.protobuf:protoc:3.21.12"
+    }
 }
 
 publishing {
     publications {
         create<MavenPublication>("maven") {
             from(components["java"])
+            // Add the proto files as an artifact with a classifier
+            artifact(files("src/main/proto")) {
+                classifier = "proto"
+            }
+
             pom {
                 name = "DLMS Protos"
                 description = "A proto library for dlms schemas."
                 url.set("https://github.com/bxute/dlms-schemas")
+                groupId = "org.dlms.protos"
+                version = project.version.toString()
 
                 licenses {
                     license {
