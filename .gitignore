@@ -42,3 +42,6 @@ bin/
 
 ### Mac OS ###
 .DS_Store
+/.idea/.gitignore
+/gradle/wrapper/gradle-wrapper.jar
+/gradle/wrapper/gradle-wrapper.properties
