@@ -1,0 +1,9 @@
+syntax = "proto3";
+
+package org.dlms.services;
+
+// Response message for event tracking
+message TrackEventResponse {
+  bool success = 1;
+  string message = 2;
+}

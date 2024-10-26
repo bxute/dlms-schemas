@@ -1,0 +1,15 @@
+syntax = "proto3";
+
+package org.dlms.services;
+
+import "ImpressionEvent.proto";
+import "ActionEvent.proto";
+import "TrackEventResponse.proto";
+
+service EventTrackingService {
+  // rpc method for tracking impression events
+  rpc trackImpression(events.ImpressionEvent) returns (services.TrackEventResponse);
+
+  // rpc method for tracking action events
+  rpc trackAction(events.ActionEvent) returns (services.TrackEventResponse);
+}
