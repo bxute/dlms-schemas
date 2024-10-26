@@ -46,7 +46,8 @@ publishing {
                 description = "A proto library for dlms schemas."
                 url.set("https://github.com/bxute/dlms-schemas")
                 groupId = "org.dlms.protos"
-                version = project.version.toString()
+                val newVersion = incrementVersion(project.findProperty("publishVersion").toString())
+                version = newVersion
 
                 licenses {
                     license {
@@ -79,4 +80,14 @@ publishing {
             }
         }
     }
+}
+
+fun incrementVersion(version: String): String {
+    val parts = version.split(".")
+    if (parts.size < 3) {
+        throw IllegalArgumentException("Version format should be MAJOR.MINOR.PATCH")
+    }
+
+    val patch = parts[2].toInt() + 1 // Increment patch version
+    return "${parts[0]}.${parts[1]}.$patch" // Reconstruct the version string
 }
