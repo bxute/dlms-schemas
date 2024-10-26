@@ -27,14 +27,19 @@ protobuf {
     }
 }
 
+tasks.register<Zip>("zipProto") {
+    from("src/main/proto")
+    archiveBaseName.set("dlms-proto")
+    archiveClassifier.set("proto")
+    destinationDirectory.set(layout.buildDirectory.dir("dist"))
+}
+
 publishing {
     publications {
         create<MavenPublication>("maven") {
             from(components["java"])
             // Add the proto files as an artifact with a classifier
-            artifact(files("src/main/proto")) {
-                classifier = "proto"
-            }
+            artifact(tasks["zipProto"])
 
             pom {
                 name = "DLMS Protos"
