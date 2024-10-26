@@ -2,9 +2,9 @@ syntax = "proto3";
 
 package org.dlms.services;
 
-import "ImpressionEvent.proto";
-import "ActionEvent.proto";
-import "TrackEventResponse.proto";
+import "events/ActionEvent.proto";
+import "events/ImpressionEvent.proto";
+import "services/TrackEventResponse.proto";
 
 service EventTrackingService {
   // rpc method for tracking impression events
