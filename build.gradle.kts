@@ -1,5 +1,4 @@
-import com.google.protobuf.gradle.protobuf
-import com.google.protobuf.gradle.protoc
+import com.google.protobuf.gradle.*
 import java.net.URI
 
 plugins {
@@ -13,21 +12,63 @@ version = "1.0.0"
 
 repositories {
     mavenCentral()
+    google()
 }
 
 dependencies {
-    implementation("com.google.protobuf:protobuf-java:3.21.12")
+    // proto buffer
+    compileOnly("com.google.protobuf:protobuf-java:4.28.2")
+
+    // grpc
+    compileOnly("io.grpc:grpc-netty-shaded:1.68.0")
+    compileOnly("io.grpc:grpc-protobuf:1.68.0")
+    compileOnly("io.grpc:grpc-stub:1.68.0")
+    compileOnly("io.grpc:protoc-gen-grpc-java:1.68.0")
+
+    // annotation
+    compileOnly("javax.annotation:javax.annotation-api:1.3.2")
+
     testImplementation(platform("org.junit:junit-bom:5.10.0"))
     testImplementation("org.junit.jupiter:junit-jupiter")
 }
 
+val generatedProtoDirectory = layout.buildDirectory.dir("generated/source/proto/main/java")
 protobuf {
     protoc {
-        artifact = "com.google.protobuf:protoc:3.21.12"
+        artifact = "com.google.protobuf:protoc:3.24.4"
+    }
+    generatedFilesBaseDir = generatedProtoDirectory.get().toString()
+    plugins {
+        id("grpc") {
+            artifact = "io.grpc:protoc-gen-grpc-java:1.68.0"
+        }
+    }
+    generateProtoTasks {
+        all().forEach {
+            it.plugins {
+                id("grpc") {}
+            }
+        }
     }
 }
 
+sourceSets {
+    main {
+        java {
+            srcDir(generatedProtoDirectory)
+        }
+    }
+}
+
+tasks.compileJava {
+    dependsOn("generateProto")
+}
+
+
 tasks.register<Zip>("zipProto") {
+    doLast {
+        println("Running zipping...")
+    }
     from("src/main/proto")
     archiveBaseName.set("dlms-proto")
     archiveClassifier.set("proto")

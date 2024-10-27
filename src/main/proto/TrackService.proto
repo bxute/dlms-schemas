@@ -1,0 +1,36 @@
+syntax = "proto3";
+
+package org.dlms.services;
+option java_multiple_files = true;
+
+service EventTrackingService {
+  // rpc method for tracking impression events
+  rpc trackImpression(ImpressionEvent) returns (TrackEventResponse);
+
+  // rpc method for tracking action events
+  rpc trackAction(ActionEvent) returns (TrackEventResponse);
+}
+
+// Response message for event tracking
+message TrackEventResponse {
+  bool success = 1;
+  string message = 2;
+}
+
+message ActionEvent {
+  string event_id = 1;
+  string action_type = 2;
+  int64 timestamp = 3;
+  string user_id = 4;
+  map<string, string> metadata = 5;
+}
+
+message ImpressionEvent {
+  string impression_id = 1;
+  string item_type = 2;
+  int64 item_id = 3;
+  int64 timestamp = 4;
+  string user_id = 5;
+  map<string, string> metadata = 6;
+  optional string location = 7;
+}
