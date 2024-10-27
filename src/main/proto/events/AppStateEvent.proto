@@ -1,0 +1,14 @@
+syntax = "proto3";
+
+package org.dlms.services.event;
+option java_multiple_files = true;
+option java_package = "org.dlms.services.event";
+
+
+message AppStateEvent {
+  string event_id = 1;
+  string action_type = 2;
+  int64 timestamp = 3;
+  string user_id = 4;
+  map<string, string> metadata = 5;
+}
