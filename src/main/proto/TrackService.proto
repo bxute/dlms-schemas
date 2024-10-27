@@ -5,10 +5,10 @@ option java_multiple_files = true;
 
 service EventTrackingService {
   // rpc method for tracking impression events
-  rpc trackImpression(ImpressionEvent) returns (TrackEventResponse);
+  rpc trackImpression(stream ImpressionEvent) returns (stream TrackEventResponse);
 
   // rpc method for tracking action events
-  rpc trackAction(ActionEvent) returns (TrackEventResponse);
+  rpc trackAction(stream ActionEvent) returns (stream TrackEventResponse);
 }
 
 // Response message for event tracking
