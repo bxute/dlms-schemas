@@ -33,28 +33,8 @@ dependencies {
     testImplementation("org.junit.jupiter:junit-jupiter")
 }
 
-val generatedProtoDirectory = layout.buildDirectory.dir("generated/source/proto/main/java")
-protobuf {
-    protoc {
-        artifact = "com.google.protobuf:protoc:3.24.4"
-    }
-    generatedFilesBaseDir = generatedProtoDirectory.get().toString()
-    plugins {
-        id("grpc") {
-            artifact = "io.grpc:protoc-gen-grpc-java:1.68.0"
-        }
-    }
-    generateProtoTasks {
-        all().forEach {
-            it.plugins {
-                id("grpc") {}
-            }
-        }
-    }
-}
-
 tasks.register<Zip>("zipProto") {
-    doLast {
+    doFirst {
         println("Running zipping...")
     }
     from("src/main/proto")
@@ -64,18 +44,6 @@ tasks.register<Zip>("zipProto") {
     destinationDirectory.set(layout.buildDirectory.dir("dist"))
 }
 
-//
-//sourceSets {
-//    main {
-//        java {
-//            srcDir(generatedProtoDirectory)
-//        }
-//    }
-//}
-
-//tasks.compileJava {
-//    dependsOn("generateProto")
-//}
 publishing {
     publications {
         create<MavenPublication>("maven") {
@@ -156,4 +124,43 @@ tasks.register("updatePublishVersion") {
 // Update version before publish
 tasks.publish {
     dependsOn("updatePublishVersion")
+    dependsOn("testGeneratedCode")
+}
+
+val generatedProtoDirectory = layout.buildDirectory.dir("generated/source/proto/main/java")
+protobuf {
+    protoc {
+        artifact = "com.google.protobuf:protoc:3.24.4"
+    }
+    generatedFilesBaseDir = generatedProtoDirectory.get().toString()
+    plugins {
+        id("grpc") {
+            artifact = "io.grpc:protoc-gen-grpc-java:1.68.0"
+        }
+    }
+    generateProtoTasks {
+        all().forEach { task ->
+            task.plugins {
+                id("grpc") {}
+            }
+            task.doFirst {
+                println("Generating proto files...")
+            }
+        }
+    }
+}
+
+// Custom task to compile generated Java code
+tasks.register("testGeneratedCode") {
+    dependsOn("compileJava")
+    doLast {
+        println("Running testGeneratedCode...")
+    }
+}
+
+tasks.named("compileJava").configure {
+    dependsOn("generateProto")
+    doFirst {
+        println("Running compileJava...")
+    }
 }
