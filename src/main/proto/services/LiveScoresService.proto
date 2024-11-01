@@ -1,0 +1,20 @@
+syntax = "proto3";
+
+package org.dlms.services;
+option java_multiple_files = true;
+
+message ScoreRequest {
+  int32 match_id = 1;
+}
+
+message ScoreResponse {
+  int32 match_id = 1;
+  string teamA = 2;
+  string teamB = 3;
+  string scoreDetail = 4;
+}
+
+service LiveScoreService {
+  // SERVER_STREAMING
+  rpc GetLiveScores(ScoreRequest) returns (stream ScoreResponse);
+}

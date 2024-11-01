@@ -4,11 +4,9 @@ package org.dlms.services;
 option java_multiple_files = true;
 
 service EventTrackingService {
-  // rpc method for tracking impression events
-  rpc trackImpression(stream ImpressionEvent) returns (stream TrackEventResponse);
-
-  // rpc method for tracking action events
-  rpc trackAction(stream ActionEvent) returns (stream TrackEventResponse);
+  // BIDI_STREAMING
+  rpc streamImpression(stream ImpressionEvent) returns (stream TrackEventResponse);
+  rpc streamAction(stream ActionEvent) returns (stream TrackEventResponse);
 }
 
 // Response message for event tracking

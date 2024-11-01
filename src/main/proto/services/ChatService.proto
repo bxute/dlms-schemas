@@ -1,0 +1,18 @@
+syntax = "proto3";
+
+package org.dlms.services;
+option java_multiple_files = true;
+
+message ChatMessage {
+  string user_id = 1;
+  string message = 2;
+}
+
+message ChatResponse {
+  string confirmation = 1;
+}
+
+service ChatService {
+  // CLIENT_STREAMING
+  rpc SendChat(stream ChatMessage) returns (ChatResponse);
+}
