@@ -1,5 +1,6 @@
 import com.google.protobuf.gradle.*
 import java.net.URI
+import java.util.*
 
 plugins {
     id("java")
@@ -52,29 +53,29 @@ protobuf {
     }
 }
 
-sourceSets {
-    main {
-        java {
-            srcDir(generatedProtoDirectory)
-        }
-    }
-}
-
-tasks.compileJava {
-    dependsOn("generateProto")
-}
-
-
 tasks.register<Zip>("zipProto") {
     doLast {
         println("Running zipping...")
     }
     from("src/main/proto")
     archiveBaseName.set("dlms-proto")
+    version = project.findProperty("publishVersion").toString()
     archiveClassifier.set("proto")
     destinationDirectory.set(layout.buildDirectory.dir("dist"))
 }
 
+//
+//sourceSets {
+//    main {
+//        java {
+//            srcDir(generatedProtoDirectory)
+//        }
+//    }
+//}
+
+//tasks.compileJava {
+//    dependsOn("generateProto")
+//}
 publishing {
     publications {
         create<MavenPublication>("maven") {
@@ -87,7 +88,7 @@ publishing {
                 description = "A proto library for dlms schemas."
                 url.set("https://github.com/bxute/dlms-schemas")
                 groupId = "org.dlms.protos"
-                val newVersion = incrementVersion(project.findProperty("publishVersion").toString())
+                val newVersion = project.findProperty("publishVersion").toString()
                 version = newVersion
 
                 licenses {
@@ -131,4 +132,28 @@ fun incrementVersion(version: String): String {
 
     val patch = parts[2].toInt() + 1 // Increment patch version
     return "${parts[0]}.${parts[1]}.$patch" // Reconstruct the version string
+}
+
+tasks.register("updatePublishVersion") {
+    doLast {
+        println("updating version...")
+        val gradlePropertiesFile = File(rootDir, "gradle.properties")
+        val properties = Properties()
+
+        if (gradlePropertiesFile.exists()) {
+            gradlePropertiesFile.inputStream().use { properties.load(it) }
+        }
+
+        val newVersion = incrementVersion(project.findProperty("publishVersion").toString())
+        // Modify properties as needed
+        properties["publishVersion"] = newVersion
+        println("new version: $newVersion")
+
+        gradlePropertiesFile.outputStream().use { properties.store(it, "Updated by updateGradleProperties task") }
+    }
+}
+
+// Update version before publish
+tasks.publish {
+    dependsOn("updatePublishVersion")
 }
